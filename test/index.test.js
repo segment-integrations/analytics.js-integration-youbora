@@ -4,41 +4,39 @@ var Analytics = require('@segment/analytics.js-core').constructor;
 var integrationTester = require('@segment/analytics.js-integration-tester');
 var integration = require('@segment/analytics.js-integration');
 var sandbox = require('@segment/clear-env');
-var Youbora = require('../lib/'); // FIXME
+var Youbora = require('../lib/');
 
-describe('Youbora', function() { // FIXME
+describe('Youbora', function() {
   var analytics;
-  var youbora; // FIXME
+  var youbora;
   var options = {};
 
   beforeEach(function() {
     analytics = new Analytics();
-    youbora = new Youbora(options); // FIXME
+    youbora = new Youbora(options);
     analytics.use(integrationTester);
-    analytics.use(Youbora); // FIXME
-    analytics.add(youbora); // FIXME
+    analytics.use(Youbora);
+    analytics.add(youbora);
   });
 
   afterEach(function() {
     analytics.restore();
     analytics.reset();
-    youbora.reset(); // FIXME
+    youbora.reset();
     sandbox();
   });
 
-  it('should have the correct options', function() { // FIXME
+  it('should have the correct options', function() {
     analytics.compare(Youbora, integration('Youbora')
     .option('accountCode', ''));
   });
 
   describe('before loading', function() {
     beforeEach(function() {
-      analytics.stub(youbora, 'load'); // FIXME
+      analytics.stub(youbora, 'load');
     });
 
     describe('#initialize', function() {
-      // write assertions here if you do any logic to create or set things in the `.initialize()` function
-
       it('should call load', function() {
         analytics.initialize();
       });
@@ -47,7 +45,7 @@ describe('Youbora', function() { // FIXME
 
   describe('loading', function() {
     it('should load', function(done) {
-      analytics.load(youbora, done); // FIXME
+      analytics.load(youbora, done);
     });
   });
 
@@ -57,7 +55,6 @@ describe('Youbora', function() { // FIXME
       analytics.initialize();
     });
 
-    // write all your post-load assertions and unit tests here such 
     describe('#track', function() {
       describe('#content events', function() {
         var props;
@@ -354,7 +351,7 @@ describe('Youbora', function() { // FIXME
           });
         });
         
-        it('video ad completed event', function() {
+        it('should correctly map props for video ad completed event', function() {
           analytics.track('Video Ad Completed', { position: 43 }, {
             integrations: {
               Youbora: {
