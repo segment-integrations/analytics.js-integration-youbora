@@ -186,6 +186,7 @@ describe('Youbora', function() {
           analytics.spy(window.plugin.viewManager, 'sendResume');
           analytics.spy(window.plugin.viewManager, 'sendSeekStart');
           analytics.spy(window.plugin.viewManager, 'sendSeekEnd');
+          analytics.spy(window.plugin.viewManager, 'sendError');
         });
 
         it('should send a join on first buffer', function() {
@@ -248,7 +249,22 @@ describe('Youbora', function() {
           analytics.called(window.plugin.viewManager.sendSeekStart);
           var args = window.plugin.viewManager.sendSeekEnd.args;
           analytics.deepEqual(args[0][0], { duration: 5 });
-        }); 
+        });
+
+        it('should correctly map props for error events', function() {
+          analytics.track('Video Playback Interrupted', { method: 'browser redirect' }, {
+            integrations: {
+              Youbora: {
+                errorCode: 32
+              }
+            }
+          });
+          var args = window.plugin.viewManager.sendError.args;
+          analytics.deepEqual(args[0][0], {
+            errorCode: 32,
+            msg: 'browser redirect'
+          });
+        });
       });
 
       describe('#ad playback events', function() {
