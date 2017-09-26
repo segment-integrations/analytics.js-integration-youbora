@@ -59,30 +59,84 @@ describe('Youbora', function() {
       describe('#content events', function() {
         var props;
         beforeEach(function() {
-          analytics.spy(window.plugin.viewManager, 'sendStart');
+          analytics.spy(window.plugin.viewManager, 'sendJoin');
           analytics.spy(window.plugin.viewManager, 'sendPing');
           analytics.spy(window.plugin.viewManager, 'sendStop');
         });
-        it('should correctly map props for video content started', function() {
-          props = {
-            userId: 32,
-            livestream: false,
-            asset_id: '29802',
-            title: 'Justin\'s video',
-            genre: 'documentary',
-            publisher: 'Justin',
-            total_length: 400
-          };
-          analytics.track('Video Content Started', props, {
+
+        it('should send a join on content started', function() {
+          analytics.track('Video Content Started',  { position: 0 }, {
             integrations: {
               Youbora: {
+                joinTime: 5
+              }
+            }
+          });
+          var args = window.plugin.viewManager.sendJoin.args;
+          analytics.deepEqual(args[0][0], {
+            eventTime: 0,
+            time: 5
+          });
+        });
+
+        it('should correctly map props for video content playing', function() {
+          props = {
+            position: 42
+          };
+          analytics.track('Video Content Playing', props, {
+            integrations: {
+              Youbora: {
+                throughput: 40,
+                bitrate: 32,
+                totalBytes: 324,
+                dataType: 0
+              }
+            }
+          });
+          var args = window.plugin.viewManager.sendPing.args;
+          analytics.deepEqual(args[0][0], {
+            time: 42,
+            throughput: 40,
+            bitrate: 32,
+            totalBytes: 324,
+            dataType: 0
+          });
+        });
+      });
+
+      describe('#playback events', function() {
+        var props;
+        beforeEach(function() {
+          analytics.spy(window.plugin.viewManager, 'sendStart');
+          analytics.spy(window.plugin.viewManager, 'sendBufferEnd');
+          analytics.spy(window.plugin.viewManager, 'sendPause');
+          analytics.spy(window.plugin.viewManager, 'sendResume');
+          analytics.spy(window.plugin.viewManager, 'sendSeekStart');
+          analytics.spy(window.plugin.viewManager, 'sendSeekEnd');
+          analytics.spy(window.plugin.viewManager, 'sendError');
+          analytics.spy(window.plugin.viewManager, 'sendStop');
+        });
+
+        it('should correctly map props for video playback started', function() {
+          props = {
+            livestream: false,
+            quality: '1080p',
+            total_length: 400
+          };
+          analytics.track('Video Playback Started', props, {
+            userId: 32,
+            integrations: {
+              Youbora: {
+                contentId: '29802',
                 transactionType: 'rental',
-                quality: '1080p',
                 contentType: 'Movie',
                 totalBytes: 3200,
                 rendition: '4',
                 cdn: '1',
                 contentMetadata: {
+                  title: 'Justin\'s video',
+                  genre: 'documentary',
+                  owner: 'Justin',
                   filename: 'justin_video',
                   language: 'English',
                   year: 2017,
@@ -109,7 +163,6 @@ describe('Youbora', function() {
               model: 'iphone 4'
             }
           });
-          analytics.assert(window.firstBuffer === true);
           var args = window.plugin.viewManager.sendStart.args;
           analytics.deepEqual(args[0][0], {
             live: false,
@@ -149,67 +202,8 @@ describe('Youbora', function() {
             }
           });
         });
-        it('should correctly map props for video content playing', function() {
-          props = {
-            position: 42
-          };
-          analytics.track('Video Content Playing', props, {
-            integrations: {
-              Youbora: {
-                throughput: 40,
-                bitrate: 32,
-                totalBytes: 324,
-                dataType: 0
-              }
-            }
-          });
-          var args = window.plugin.viewManager.sendPing.args;
-          analytics.deepEqual(args[0][0], {
-            time: 42,
-            throughput: 40,
-            bitrate: 32,
-            totalBytes: 324,
-            dataType: 0
-          });
-        });
-        it('should send a sendstop when video content completed', function() {
-          analytics.track('Video Content Completed');
-          analytics.called(window.plugin.viewManager.sendStop);
-        });
-      });
-
-      describe('#playback events', function() {
-        beforeEach(function() {
-          analytics.spy(window.plugin.viewManager, 'sendJoin');
-          analytics.spy(window.plugin.viewManager, 'sendBufferEnd');
-          analytics.spy(window.plugin.viewManager, 'sendPause');
-          analytics.spy(window.plugin.viewManager, 'sendResume');
-          analytics.spy(window.plugin.viewManager, 'sendSeekStart');
-          analytics.spy(window.plugin.viewManager, 'sendSeekEnd');
-          analytics.spy(window.plugin.viewManager, 'sendError');
-        });
-
-        it('should send a join on first buffer', function() {
-          window.adPlaying = false;
-          window.firstBuffer = true;
-          analytics.track('Video Playback Buffer Started');
-          analytics.track('Video Playback Buffer Completed', { position: 0 }, {
-            integrations: {
-              Youbora: {
-                duration: 5
-              }
-            }
-          });
-          var args = window.plugin.viewManager.sendJoin.args;
-          analytics.deepEqual(args[0][0], {
-            eventTime: 0,
-            time: 5
-          });
-        });
 
         it('should correctly map props for buffering events', function() {
-          window.adPlaying = false;
-          window.firstBuffer = false;
           analytics.track('Video Playback Buffer Started');
           analytics.track('Video Playback Buffer Completed', { position: 10 }, {
             integrations: {
@@ -226,7 +220,6 @@ describe('Youbora', function() {
         });
 
         it('should send a pause for playback pause event', function() {
-          window.adPlaying = false;
           analytics.track('Video Playback Paused');
           analytics.called(window.plugin.viewManager.sendPause);
         });
@@ -265,6 +258,11 @@ describe('Youbora', function() {
             msg: 'browser redirect'
           });
         });
+
+        it('should send a sendstop when video playback completed', function() {
+          analytics.track('Video Playback Completed');
+          analytics.called(window.plugin.viewManager.sendStop);
+        });
       });
 
       describe('#ad playback events', function() {
@@ -302,13 +300,13 @@ describe('Youbora', function() {
             adTitle: 'Justin\'s ad',
             adDuration: 32
           });
-          analytics.assert(window.adPlaying === true);
-          analytics.assert(window.firstAdBuffer === true);
+          analytics.assert(youbora.adPlaying === true);
+          analytics.assert(youbora.firstAdBuffer === true);
         });
 
         it('should send a join for first ad buffer event', function() {
-          window.adPlaying = true;
-          window.firstAdBuffer = true;
+          youbora.adPlaying = true;
+          youbora.firstAdBuffer = true;
           analytics.track('Video Playback Buffer Started');
           analytics.track('Video Playback Buffer Completed', {}, {
             integrations: {
@@ -321,12 +319,12 @@ describe('Youbora', function() {
           analytics.deepEqual(args[0][0], {
             adJoinDuration: 4
           });
-          analytics.assert(window.firstAdBuffer === false);
+          analytics.assert(youbora.firstAdBuffer === false);
         });
 
         it('should correctly map props for ad buffer events', function() {
-          window.adPlaying = true;
-          window.firstAdBuffer = false;
+          youbora.adPlaying = true;
+          youbora.firstAdBuffer = false;
           analytics.track('Video Playback Buffer Started');
           analytics.track('Video Playback Buffer Completed', { position: 19 }, {
             integrations: {
