@@ -81,13 +81,13 @@ describe('Youbora', function() {
 
         it('should correctly map props for video content playing', function() {
           props = {
-            position: 42
+            position: 42,
+            bitrate: 32
           };
           analytics.track('Video Content Playing', props, {
             integrations: {
               Youbora: {
                 throughput: 40,
-                bitrate: 32,
                 totalBytes: 324,
                 dataType: 0
               }
@@ -119,12 +119,13 @@ describe('Youbora', function() {
 
         it('should correctly map props for video playback started', function() {
           props = {
+            userId: 32,
             livestream: false,
             quality: '1080p',
             total_length: 400
           };
+          analytics.user().id(32);
           analytics.track('Video Playback Started', props, {
-            userId: 32,
             integrations: {
               Youbora: {
                 contentId: '29802',
@@ -225,7 +226,6 @@ describe('Youbora', function() {
         });
 
         it('should send a resume for playback resume event', function() {
-          window.adPlaying = false;
           analytics.track('Video Playback Resumed');
           analytics.called(window.plugin.viewManager.sendResume);
         });
@@ -274,6 +274,8 @@ describe('Youbora', function() {
           analytics.spy(window.plugin.viewManager, 'sendAdBufferStart');
           analytics.spy(window.plugin.viewManager, 'sendPing');
           analytics.spy(window.plugin.viewManager, 'sendAdStop');
+          analytics.spy(window.plugin.viewManager, 'sendAdPause');
+          analytics.spy(window.plugin.viewManager, 'sendAdResume');
         });
 
         it('should correctly map props for video ad started event', function() {
@@ -300,15 +302,13 @@ describe('Youbora', function() {
             adTitle: 'Justin\'s ad',
             adDuration: 32
           });
-          analytics.assert(youbora.adPlaying === true);
           analytics.assert(youbora.firstAdBuffer === true);
         });
 
         it('should send a join for first ad buffer event', function() {
-          youbora.adPlaying = true;
           youbora.firstAdBuffer = true;
-          analytics.track('Video Playback Buffer Started');
-          analytics.track('Video Playback Buffer Completed', {}, {
+          analytics.track('Video Playback Buffer Started', { ad_asset_id: 3 });
+          analytics.track('Video Playback Buffer Completed', { ad_asset_id: 3 }, {
             integrations: {
               Youbora: {
                 duration: 4
@@ -323,10 +323,9 @@ describe('Youbora', function() {
         });
 
         it('should correctly map props for ad buffer events', function() {
-          youbora.adPlaying = true;
           youbora.firstAdBuffer = false;
-          analytics.track('Video Playback Buffer Started');
-          analytics.track('Video Playback Buffer Completed', { position: 19 }, {
+          analytics.track('Video Playback Buffer Started', { ad_asset_id: 3 });
+          analytics.track('Video Playback Buffer Completed', { position: 19, ad_asset_id: 3 }, {
             integrations: {
               Youbora: {
                 duration: 4
@@ -340,16 +339,26 @@ describe('Youbora', function() {
             adPlayhead: 19
           });
         });
+
+        it('should send a adPause for pauses during ads', function() {
+          analytics.track('Video Playback Paused', { ad_asset_id: 3 });
+          analytics.called(window.plugin.viewManager.sendAdPause);
+        });
+
+        it('should send a adPause for resumes during ads', function() {
+          analytics.track('Video Playback Resumed', { ad_asset_id: 3 });
+          analytics.called(window.plugin.viewManager.sendAdResume);
+        });
         
         it('should correctly map props for video ad playing', function() {
           props = {
+            bitrate: 32,            
             position: 42
           };
           analytics.track('Video Ad Playing', props, {
             integrations: {
               Youbora: {
                 throughput: 40,
-                bitrate: 32,
                 totalBytes: 324,
                 dataType: 0
               }
