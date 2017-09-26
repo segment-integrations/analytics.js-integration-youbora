@@ -1,4 +1,12 @@
 
+1.0.1 / 2017-09-26
+==================
+
+  * kill ie7/8
+  * declared self var
+  * removed console log
+  * circleci badge on readme
+
 1.0.0 / 2017-09-26
 ==================
 
