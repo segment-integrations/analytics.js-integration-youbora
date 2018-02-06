@@ -37,7 +37,7 @@
     "lodash.isequal": "4.5.0"
   },
   "devDependencies": {
-    "@segment/analytics.js-core": "^3.2.6",
+    "@segment/analytics.js-core": "^3.2.5",
     "@segment/analytics.js-integration-tester": "^3.1.0",
     "@segment/clear-env": "^2.0.0",
     "@segment/eslint-config": "^3.1.1",
