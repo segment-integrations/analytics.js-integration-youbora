@@ -48,28 +48,15 @@ describe('Youbora', function() {
         });
 
         it('should send a join and start on content started', function() {
-          analytics.track('Video Content Started',  { session_id: 1 , title: 'Test Title'});
+          analytics.track('Video Content Started',  { session_id: 1 , title: 'Test Title' });
           var plugin = youbora.pluginMap[1];
           var adapter = plugin.getAdapter();
           var args = plugin.setOptions.args[0][0];
 
-          analytics.deepEqual({'content.title': 'Test Title'}, args);
+          analytics.deepEqual({ 'content.title': 'Test Title' }, args);
           analytics.called(adapter.fireJoin);
           analytics.called(adapter.fireStart);
         });
-
-        describe('#ad content events', function() {
-          it('should send ad start when ad asset id is attached to a start', function() {
-            analytics.track('Video Content Started', { session_id: 1, title: 'Test Ad Title', ad_asset_id: 1 });
-
-            var plugin = youbora.pluginMap[1];
-            var adsAdapter = plugin.getAdsAdapter();
-            var args = plugin.setOptions.args[0][0];
-
-            analytics.deepEqual({'ad.title': 'Test Ad Title'}, args);
-            analytics.called(adsAdapter.fireStart);
-          })
-        })
       });
 
       describe('#playback events', function() {
@@ -89,7 +76,6 @@ describe('Youbora', function() {
           analytics.spy(youbora.pluginMap[1].getAdsAdapter(), 'fireResume');
           analytics.spy(youbora.pluginMap[1].getAdsAdapter(), 'fireSeekBegin');
           analytics.spy(youbora.pluginMap[1].getAdsAdapter(), 'fireSeekEnd');
-
         });
 
         it('should call the correct youbora methods for buffering events', function() {
@@ -136,7 +122,7 @@ describe('Youbora', function() {
           analytics.track('Video Playback Interrupted', { session_id: 1 });
 
           var plugin = youbora.pluginMap[1];
-          analytics.called(plugin.fireError)
+          analytics.called(plugin.fireError);
         });
 
         it('should send a sendstop when video playback completed', function() {
@@ -186,6 +172,45 @@ describe('Youbora', function() {
             analytics.called(adapter.fireSeekBegin);
             analytics.called(adapter.fireSeekEnd);
           });
+        });
+      });
+
+      describe('ad events', function() {
+        beforeEach(function() {
+          analytics.track('Video Playback Started', { session_id: 1 });
+          analytics.spy(youbora.pluginMap[1].getAdsAdapter(), 'fireStart');
+          analytics.spy(youbora.pluginMap[1].getAdsAdapter(), 'fireStop');
+          analytics.spy(youbora.pluginMap[1].getAdsAdapter(), 'fireClick');
+          analytics.spy(youbora.pluginMap[1], 'setOptions');
+        });
+
+        it('should send ad start correctly', function() {
+          analytics.track('Video Ad Started', { session_id: 1, title: 'Test Ad Title', ad_asset_id: 1 });
+
+          var plugin = youbora.pluginMap[1];
+          var adsAdapter = plugin.getAdsAdapter();
+          var args = plugin.setOptions.args[0][0];
+
+          analytics.deepEqual({ 'ad.title': 'Test Ad Title' }, args);
+          analytics.called(adsAdapter.fireStart);
+        });
+
+        it('should send video ad completed correctly', function() {
+          analytics.track('Video Ad Completed', { session_id: 1, ad_asset_id: 1 });
+
+          var plugin = youbora.pluginMap[1];
+          var adsAdapter = plugin.getAdsAdapter();
+
+          analytics.called(adsAdapter.fireStop);
+        });
+
+        it('should send video ad clicked correctly', function() {
+          analytics.track('Video Ad Clicked', { session_id: 1, ad_asset_id: 1 });
+
+          var plugin = youbora.pluginMap[1];
+          var adsAdapter = plugin.getAdsAdapter();
+
+          analytics.called(adsAdapter.fireClick);
         });
       });
     });
