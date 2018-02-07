@@ -43,8 +43,6 @@ describe('Youbora', function() {
           analytics.track('Video Playback Started', { session_id: 1 });
           analytics.spy(youbora.pluginMap[1], 'setOptions');
           analytics.spy(youbora.pluginMap[1].getAdapter(), 'fireJoin');
-          analytics.spy(youbora.pluginMap[1].getAdapter(), 'fireStart');
-          analytics.spy(youbora.pluginMap[1].getAdsAdapter(), 'fireStart');
         });
 
         it('should send a join and start on content started', function() {
@@ -55,7 +53,6 @@ describe('Youbora', function() {
 
           analytics.deepEqual({ 'content.title': 'Test Title' }, args);
           analytics.called(adapter.fireJoin);
-          analytics.called(adapter.fireStart);
         });
       });
 
