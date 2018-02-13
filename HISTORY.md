@@ -1,4 +1,14 @@
 
+2.1.0 / 2018-02-12
+==================
+
+  * Pull in Youbora libs via scripts instead of NPM
+
+2.0.0 / 2018-02
+==================
+
+  * Upgrade to Youbora v6
+
 1.0.1 / 2017-09-26
 ==================
 
