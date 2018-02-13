@@ -51,7 +51,7 @@ describe('Youbora', function() {
           var adapter = plugin.getAdapter();
           var args = plugin.setOptions.args[0][0];
 
-          analytics.deepEqual({ 'content.title': 'Test Title' }, args);
+          analytics.deepEqual({ 'content.title': 'Test Title', 'content.metadata': {} }, args);
           analytics.called(adapter.fireJoin);
         });
       });
