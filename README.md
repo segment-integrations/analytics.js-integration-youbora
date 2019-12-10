@@ -1,9 +1,13 @@
-# analytics.js-integration-youbora
 
-[![CircleCI](https://circleci.com/gh/segment-integrations/integration-marketo.svg?style=shield&circle-token=0aa68d09e8580056ed9cfd3ee7665aa73aa4a2f8)](https://circleci.com/gh/segment-integrations/analytics.js-integration-youbora)
+# [MOVED] Analytics JS integration youbora
 
-The Segment Youbora Integration
+**This repository has been moved to the open source [Analytics JS Integrations](https://github.com/segmentio/analytics.js-integrations).**
 
-## License
+If you want to fork, contribute, or open issues, please do it in the new repository. Existing issues/pull requests will be addressed in the new location.
+
+* [New location](https://github.com/segmentio/analytics.js-integrations/tree/master/integrations/youbora)
+* Last release for this repository: [2.1.5](https://github.com/segment-integrations/analytics.js-integration-youbora/releases/tag/2.1.5)
+* [Commit](https://github.com/segmentio/analytics.js-integrations/commit/a6b30f08892673a98ef43f085b68a753ee092c24)
+* [Previous version of this README](README-OLD.md)
 
 Released under the [MIT license](LICENSE).
